@@ -2,6 +2,7 @@
 const dotenv = require("dotenv");
 dotenv.config();
 
+// import/settingan umum
 const express = require("express");
 const cors = require("cors");
 const { PrismaClient } = require("@prisma/client");

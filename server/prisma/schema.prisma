@@ -18,5 +18,6 @@ model Product {
   name        String
   price       Float
   description String?
-  createdAt   DateTime @default(now())
+  image       String?
+
 }
