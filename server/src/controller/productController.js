@@ -19,6 +19,40 @@ exports.getProducts = async (req, res) => {
   }
 };
 
+exports.getProductById = async (req, res) => {
+  const productId = Number(req.params.id);
+  if (isNaN(productId) || productId <= 0) {
+    return res.status(400).json({
+      message: "ID produk tidak valid",
+    });
+  }
+
+  try {
+    const productById = await prisma.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+
+    if (!productById) {
+      return res.status(404).json({
+        message: `Produk dengan id ${productId} tidak ditemukan`,
+      });
+    }
+
+    res.status(200).json({
+      data: productById,
+      message: "Berhasil dapat produk berdasarkan id",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Terjadi kesalahan pada server",
+      error: error.message,
+    });
+    console.error(error);
+  }
+};
+
 exports.addProducts = async (req, res) => {
   const newProductData = req.body;
 
