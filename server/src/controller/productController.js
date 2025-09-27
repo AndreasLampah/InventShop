@@ -1,5 +1,4 @@
 const { PrismaClient } = require("@prisma/client");
-const { data } = require("react-router");
 const prisma = new PrismaClient();
 
 exports.getProducts = async (req, res) => {
@@ -11,11 +10,12 @@ exports.getProducts = async (req, res) => {
       message: "Berhasil ambil data produk",
     });
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       message: "Gagal ambil data produk",
       error: error.message,
     });
-    console.error(error);
   }
 };
 
@@ -45,11 +45,12 @@ exports.getProductById = async (req, res) => {
       message: "Berhasil dapat produk berdasarkan id",
     });
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       message: "Terjadi kesalahan pada server",
       error: error.message,
     });
-    console.error(error);
   }
 };
 
@@ -85,11 +86,12 @@ exports.addProducts = async (req, res) => {
       message: "Produk berhasil ditambahkan",
     });
   } catch (error) {
-    res.status(400).json({
+    console.error(error);
+
+    res.status(500).json({
       message: "Gagal menambahkan produk",
       error: error.message,
     });
-    console.error(error);
   }
 };
 
@@ -113,6 +115,8 @@ exports.deleteProduct = async (req, res) => {
       message: "Produk berhasil dihapus",
     });
   } catch (error) {
+    console.error(error);
+
     if (error.code === "P2025") {
       return res.status(404).json({
         message: "Produk tidak ditemukan",
@@ -123,6 +127,5 @@ exports.deleteProduct = async (req, res) => {
       message: "Gagal menghapus produk",
       error: error.message,
     });
-    console.error(error);
   }
 };
