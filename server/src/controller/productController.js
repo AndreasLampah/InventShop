@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const { data } = require("react-router");
 const prisma = new PrismaClient();
 
 exports.getProducts = async (req, res) => {
@@ -126,6 +127,90 @@ exports.deleteProduct = async (req, res) => {
     res.status(500).json({
       message: "Gagal menghapus produk",
       error: error.message,
+    });
+  }
+};
+
+exports.editProductById = async (req, res) => {
+  const productId = Number(req.params.id);
+
+  const editProductData = req.body;
+
+  if (isNaN(productId) || productId <= 0) {
+    return res.status(400).json({
+      message: "ID harus berupa angka dan lebih dari 0",
+    });
+  }
+
+  const dataToUpdate = {};
+
+  if (editProductData.image !== undefined) {
+    const image = editProductData.image.trim();
+    if (image.length === 0) {
+      return res.status(400).json({
+        message: "Gambar tidak boleh kosong",
+      });
+    }
+    dataToUpdate.image = image;
+  }
+
+  if (editProductData.description !== undefined) {
+    const description = editProductData.description.trim();
+    if (description.length === 0) {
+      return res.status(400).json({
+        message: "Deskripsi tidak boleh kosong",
+      });
+    }
+    dataToUpdate.description = description;
+  }
+
+  if (editProductData.name !== undefined) {
+    const name = editProductData.name.trim();
+    if (name.length === 0) {
+      return res.status(400).json({
+        message: "Nama tidak boleh kosong",
+      });
+    }
+    dataToUpdate.name = name;
+  }
+
+  if (editProductData.price !== undefined) {
+    const price = parseFloat(editProductData.price);
+    if (isNaN(price) || price <= 0) {
+      return res.status(400).json({
+        message: "Harga harus berupa angka dan lebih dari 0",
+      });
+    }
+    dataToUpdate.price = price;
+  }
+
+  if (Object.keys(dataToUpdate).length === 0) {
+    return res.status(400).json({ message: "Tidak ada field untuk diupdate" });
+  }
+
+  try {
+    const product = await prisma.product.update({
+      where: {
+        id: productId,
+      },
+      data: dataToUpdate,
+    });
+
+    res.status(200).json({
+      data: product,
+      message: "Produk berhasil diupdate",
+    });
+  } catch (error) {
+    console.error(error);
+
+    if (error.code === "P2025") {
+      return res.status(404).json({
+        message: "Produk tidak ditemukan",
+      });
+    }
+
+    res.status(500).json({
+      message: "Internal server error",
     });
   }
 };
